@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         verbose="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="CEP API SDK Test Suite">
+            <file>tests/TakeBlipTest.php</file>
+            <file>tests/Models/TemplateUrlTest.php</file>
+            <file>tests/Factories/MessageFactoryTest.php</file>
+            <file>tests/Exceptions/HttpClientExceptionTest.php</file>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/</directory>
+        </whitelist>
+    </filter>
+    <php>
+        <env name="TAKEBLIP_API_KEY" value="anyKey"/>
+        <env name="VALID_PHONE" value="5511900000000"/>
+        <env name="INVALID_PHONE" value="0"/>
+    </php>
+</phpunit>
