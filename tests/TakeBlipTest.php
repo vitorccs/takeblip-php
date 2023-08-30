@@ -3,7 +3,7 @@
 namespace TakeBlip\Test;
 
 use GuzzleHttp\Psr7\Response;
-use TakeBlip\Models\Template;
+use TakeBlip\Entities\Template;
 
 class TakeBlipTest extends BaseTest
 {
@@ -44,7 +44,7 @@ class TakeBlipTest extends BaseTest
     }
 
     /**
-     * @dataProvider validTemplate
+     * @dataProvider validDocumentTemplate
      */
     public function testSendNotification(Template $template)
     {

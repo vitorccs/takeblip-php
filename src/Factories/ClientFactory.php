@@ -30,10 +30,10 @@ class ClientFactory
     /**
      *
      */
-    const SDK_VERSION = '1.0';
+    const SDK_VERSION = '1.1.0';
 
     /**
-     * @var string|bool|null
+     * @var string|null
      */
     private static ?string $apiKey;
 
@@ -51,8 +51,8 @@ class ClientFactory
     public static function create(?string $apiKey = null,
                                   ?int    $timeout = null): Client
     {
-        self::$apiKey = $apiKey ?: getenv(self::API_KEY_NAME);
-        self::$timeout = $timeout ?: getenv(self::API_TIMEOUT_NAME, self::DEFAULT_TIMEOUT);
+        self::$apiKey = $apiKey ?: getenv(self::API_KEY_NAME) ?: null;
+        self::$timeout = $timeout ?: getenv(self::API_TIMEOUT_NAME) ?: self::DEFAULT_TIMEOUT;
 
         self::validate();
 

@@ -2,9 +2,13 @@
 
 namespace TakeBlip\Builders;
 
+use TakeBlip\Entities\TemplateUrlDocument;
+use TakeBlip\Entities\TemplateUrlImage;
+use TakeBlip\Entities\Template;
+use TakeBlip\Entities\TemplateUrlVideo;
+use TakeBlip\Enums\TemplateType;
+use TakeBlip\Exceptions\TakeBlipException;
 use TakeBlip\Helpers\StringHelper;
-use TakeBlip\Models\Template;
-use TakeBlip\Models\TemplateUrl;
 
 class TemplateBuilder
 {
@@ -58,7 +62,7 @@ class TemplateBuilder
      */
     public function addVariable(string $variable): self
     {
-        array_push($this->template->variables, $variable);
+        $this->template->variables[] = $variable;
         return $this;
     }
 
@@ -68,7 +72,7 @@ class TemplateBuilder
      */
     public function addReply(string $button): self
     {
-        array_push($this->template->replies, $button);
+        $this->template->replies[] = $button;
         return $this;
     }
 
@@ -77,12 +81,19 @@ class TemplateBuilder
      * @param string $type
      * @param string|null $filename
      * @return $this
+     * @throws TakeBlipException
      */
-    public function setUrl(string $url,
-                           string $type,
+    public function setUrl(string  $url,
+                           string  $type,
                            ?string $filename = null): self
     {
-        $this->template->url = new TemplateUrl($url, $type, $filename);
+        $this->template->url = match ($type) {
+            TemplateType::DOCUMENT->value => new TemplateUrlDocument($url, $filename),
+            TemplateType::IMAGE->value => new TemplateUrlImage($url),
+            TemplateType::VIDEO->value => new TemplateUrlVideo($url, $filename),
+            default => throw new TakeBlipException('Invalid URL "type" value'),
+        };
+
         return $this;
     }
 

@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use Psr\Http\Message\ResponseInterface;
+use TakeBlip\Enums\HttpMethod;
 use TakeBlip\Exceptions\HttpClientException;
 use TakeBlip\Exceptions\HttpServerException;
 use TakeBlip\Exceptions\TakeBlipException;
@@ -38,7 +39,7 @@ class Resource
     public function post(string $endpoint, array $data = []): ?object
     {
         $this->addUuid($data);
-        return $this->request('POST', $endpoint, ['json' => $data]);
+        return $this->request(HttpMethod::POST, $endpoint, ['json' => $data]);
     }
 
     /**
@@ -54,10 +55,10 @@ class Resource
      * @throws HttpServerException
      * @throws TakeBlipException
      */
-    private function request(string $method, string $endpoint, array $options = []): ?object
+    private function request(HttpMethod $method, string $endpoint, array $options = []): ?object
     {
         try {
-            $response = $this->client->request($method, $endpoint, $options);
+            $response = $this->client->request($method->value, $endpoint, $options);
         } catch (\Throwable $e) {
             $response = method_exists($e, 'getResponse')
                 ? $e->getResponse()
@@ -102,7 +103,7 @@ class Resource
 
         $code = $error['code'] ?? $e->getCode();
         $message = $error['description'] ?? $e->getMessage();
-        $httpCode = $response ? $response->getStatusCode() : null;
+        $httpCode = $response?->getStatusCode();
 
         if ($e instanceof ClientException || !is_null($error)) {
             throw new HttpClientException($message, $httpCode, $code);
