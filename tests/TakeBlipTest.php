@@ -4,9 +4,13 @@ namespace TakeBlip\Test;
 
 use GuzzleHttp\Psr7\Response;
 use TakeBlip\Entities\Template;
+use TakeBlip\Test\DataProviders\PhoneData;
+use TakeBlip\Test\DataProviders\WhatsAppTemplates;
 
 class TakeBlipTest extends BaseTest
 {
+    use PhoneData, WhatsAppTemplates;
+
     public function testGetMessageTemplates()
     {
         $this->handler->append(new Response(200, [], '{"resource": null }'));
@@ -18,7 +22,7 @@ class TakeBlipTest extends BaseTest
     }
 
     /**
-     * @dataProvider validPhone
+     * @dataProvider dataValidPhone
      */
     public function testGetUserIdentity(string $phone)
     {
@@ -31,7 +35,7 @@ class TakeBlipTest extends BaseTest
     }
 
     /**
-     * @dataProvider validPhone
+     * @dataProvider dataValidPhone
      */
     public function testGetNotificationEvents(string $phone)
     {
@@ -44,7 +48,7 @@ class TakeBlipTest extends BaseTest
     }
 
     /**
-     * @dataProvider validDocumentTemplate
+     * @dataProvider dataValidTextTemplate
      */
     public function testSendNotification(Template $template)
     {

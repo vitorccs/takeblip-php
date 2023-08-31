@@ -5,11 +5,14 @@ namespace TakeBlip\Test\Exceptions;
 use GuzzleHttp\Psr7\Response;
 use TakeBlip\Exceptions\HttpClientException;
 use TakeBlip\Test\BaseTest;
+use TakeBlip\Test\DataProviders\PhoneData;
 
 class HttpClientExceptionTest extends BaseTest
 {
+    use PhoneData;
+
     /**
-     * @dataProvider invalidPhone
+     * @dataProvider dataInvalidPhone
      */
     public function testFailureFromStatus(string $phone)
     {
@@ -22,7 +25,7 @@ class HttpClientExceptionTest extends BaseTest
     }
 
     /**
-     * @dataProvider invalidPhone
+     * @dataProvider dataInvalidPhone
      */
     public function testFailureFromDescription(string $phone)
     {
