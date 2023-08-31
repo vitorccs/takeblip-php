@@ -5,14 +5,17 @@ namespace TakeBlip\Test\Factories;
 use TakeBlip\Entities\Template;
 use TakeBlip\Factories\MessageFactory;
 use TakeBlip\Test\BaseTest;
+use TakeBlip\Test\DataProviders\WhatsAppTemplates;
 
 class MessageFactoryTest extends BaseTest
 {
+    use WhatsAppTemplates;
+
     /**
-     * @dataProvider validTextTemplate
-     * @dataProvider validDocumentTemplate
-     * @dataProvider validImageTemplate
-     * @dataProvider validVideoTemplate
+     * @dataProvider dataValidTextTemplate
+     * @dataProvider dataValidDocumentTemplate
+     * @dataProvider dataValidImageTemplate
+     * @dataProvider dataValidVideoTemplate
      */
     public function testBase(Template $template)
     {
@@ -41,10 +44,10 @@ class MessageFactoryTest extends BaseTest
     }
 
     /**
-     * @dataProvider validTextTemplate
-     * @dataProvider validDocumentTemplate
-     * @dataProvider validImageTemplate
-     * @dataProvider validVideoTemplate
+     * @dataProvider dataValidTextTemplate
+     * @dataProvider dataValidDocumentTemplate
+     * @dataProvider dataValidImageTemplate
+     * @dataProvider dataValidVideoTemplate
      */
     public function testHeaderSection(Template $template)
     {
@@ -67,10 +70,10 @@ class MessageFactoryTest extends BaseTest
     }
 
     /**
-     * @dataProvider validTextTemplate
-     * @dataProvider validDocumentTemplate
-     * @dataProvider validImageTemplate
-     * @dataProvider validVideoTemplate
+     * @dataProvider dataValidTextTemplate
+     * @dataProvider dataValidDocumentTemplate
+     * @dataProvider dataValidImageTemplate
+     * @dataProvider dataValidVideoTemplate
      */
     public function testBodySection(Template $template)
     {
@@ -93,10 +96,10 @@ class MessageFactoryTest extends BaseTest
     }
 
     /**
-     * @dataProvider validTextTemplate
-     * @dataProvider validDocumentTemplate
-     * @dataProvider validImageTemplate
-     * @dataProvider validVideoTemplate
+     * @dataProvider dataValidTextTemplate
+     * @dataProvider dataValidDocumentTemplate
+     * @dataProvider dataValidImageTemplate
+     * @dataProvider dataValidVideoTemplate
      */
     public function testRepliesSection(Template $template)
     {
