@@ -10,9 +10,8 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="CEP API SDK Test Suite">
+        <testsuite name="Take BLIP SDK Test Suite">
             <file>tests/TakeBlipTest.php</file>
-            <file>tests/Models/TemplateUrlTest.php</file>
             <file>tests/Factories/MessageFactoryTest.php</file>
             <file>tests/Exceptions/HttpClientExceptionTest.php</file>
         </testsuite>
