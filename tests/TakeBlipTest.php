@@ -18,7 +18,7 @@ class TakeBlipTest extends BaseTest
         $response = $this->takeBlip->getMessageTemplates();
 
         $this->assertIsObject($response);
-        $this->assertObjectHasAttribute('resource', $response);
+        $this->assertObjectHasProperty('resource', $response);
     }
 
     /**
@@ -31,7 +31,7 @@ class TakeBlipTest extends BaseTest
         $response = $this->takeBlip->getUserIdentity($phone);
 
         $this->assertIsObject($response);
-        $this->assertObjectHasAttribute('resource', $response);
+        $this->assertObjectHasProperty('resource', $response);
     }
 
     /**
@@ -44,7 +44,7 @@ class TakeBlipTest extends BaseTest
         $response = $this->takeBlip->getNotificationEvents($phone);
 
         $this->assertIsObject($response);
-        $this->assertObjectHasAttribute('resource', $response);
+        $this->assertObjectHasProperty('resource', $response);
     }
 
     /**
