@@ -29,9 +29,8 @@ class Link
             'link' => $this->url->url,
         ];
 
-        if ($this->url->filename) {
+        if (!is_null($this->url->filename)) {
             $details['filename'] = $this->url->filename;
-
         }
 
         return [

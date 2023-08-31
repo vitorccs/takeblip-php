@@ -52,7 +52,7 @@ $response = $takeBlip->getMessageTemplates();
 $response = $takeBlip->getUserIdentity('551190000000');
 
 // Enviar Notificação Ativa
-$takeBlip->sendNotification($template);
+$takeBlip->sendNotification($pictureTemplate);
 
 // Consultar os eventos da Notificação disparada
 $takeBlip->getNotificationEvents('myNotificationId');

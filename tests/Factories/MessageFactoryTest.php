@@ -46,7 +46,33 @@ class MessageFactoryTest extends BaseTest
      * @dataProvider validImageTemplate
      * @dataProvider validVideoTemplate
      */
-    public function testBody(Template $template)
+    public function testHeaderSection(Template $template)
+    {
+        $message = MessageFactory::create($template);
+
+        $headers = array_values(
+            array_filter(
+                $message['content']['template']['components'],
+                fn($component) => ($component['type'] ?? null) === 'header'
+            )
+        );
+
+        $isHeaderRequired = !is_null($template->url);
+
+        $this->assertCount($isHeaderRequired ? 1 : 0, $headers);
+
+        if ($isHeaderRequired) {
+            $this->assertUrls($template, reset($headers));
+        }
+    }
+
+    /**
+     * @dataProvider validTextTemplate
+     * @dataProvider validDocumentTemplate
+     * @dataProvider validImageTemplate
+     * @dataProvider validVideoTemplate
+     */
+    public function testBodySection(Template $template)
     {
         $message = MessageFactory::create($template);
 
@@ -57,21 +83,12 @@ class MessageFactoryTest extends BaseTest
             )
         );
 
-        $this->assertCount(1, $bodies);
-        $this->assertArrayHasKey('parameters', $bodies[0]);
+        $isBodyRequired = count($template->variables);
 
-        $variables = array_values(
-            array_filter(
-                $bodies[0]['parameters'],
-                fn($parameter) => ($parameter['type'] ?? null) === 'text'
-            )
-        );
+        $this->assertCount($isBodyRequired ? 1 : 0, $bodies);
 
-        $this->assertCount(count($template->variables), $variables);
-
-        foreach ($variables as $i => $variable) {
-            $this->assertArrayHasKey('text', $variable);
-            $this->assertSame($template->variables[$i], $variable['text']);
+        if ($isBodyRequired) {
+            $this->assertVariables($template, reset($bodies));
         }
     }
 
@@ -81,7 +98,7 @@ class MessageFactoryTest extends BaseTest
      * @dataProvider validImageTemplate
      * @dataProvider validVideoTemplate
      */
-    public function testReplies(Template $template)
+    public function testRepliesSection(Template $template)
     {
         $message = MessageFactory::create($template);
 
@@ -111,35 +128,22 @@ class MessageFactoryTest extends BaseTest
     }
 
     /**
-     * @dataProvider validTextTemplate
-     * @dataProvider validDocumentTemplate
-     * @dataProvider validImageTemplate
-     * @dataProvider validVideoTemplate
+     * @param Template $template
+     * @param array $header
+     * @return void
      */
-    public function testUrls(Template $template)
+    private function assertUrls(Template $template, array $header): void
     {
-        $message = MessageFactory::create($template);
-
-        $headers = array_values(
-            array_filter(
-                $message['content']['template']['components'],
-                fn($component) => ($component['type'] ?? null) === 'header'
-            )
-        );
-
-        $this->assertCount(1, $headers);
-        $this->assertArrayHasKey('parameters', $headers[0]);
+        $this->assertArrayHasKey('parameters', $header);
 
         $urls = array_values(
             array_filter(
-                $headers[0]['parameters'],
+                $header['parameters'],
                 fn($parameter) => in_array(($parameter['type'] ?? null), ['document', 'image', 'video'])
             )
         );
 
-        $countTemplateUrl = is_null($template->url) ? 0 : 1;
-
-        $this->assertCount($countTemplateUrl, $urls);
+        $this->assertCount(1, $urls);
 
         foreach ($urls as $url) {
             $type = $template->url->type->value;
@@ -156,6 +160,30 @@ class MessageFactoryTest extends BaseTest
             } else {
                 $this->assertArrayNotHasKey('filename', $url[$type]);
             }
+        }
+    }
+
+    /**
+     * @param Template $template
+     * @param array $body
+     * @return void
+     */
+    private function assertVariables(Template $template, array $body): void
+    {
+        $this->assertArrayHasKey('parameters', $body);
+
+        $variables = array_values(
+            array_filter(
+                $body['parameters'],
+                fn($parameter) => ($parameter['type'] ?? null) === 'text'
+            )
+        );
+
+        $this->assertCount(count($template->variables), $variables);
+
+        foreach ($variables as $i => $variable) {
+            $this->assertArrayHasKey('text', $variable);
+            $this->assertSame($template->variables[$i], $variable['text']);
         }
     }
 }

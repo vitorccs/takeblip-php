@@ -28,23 +28,49 @@ class MessageFactory
                         'code' => $template->languageCode,
                         'policy' => 'deterministic'
                     ],
-                    'components' => array_merge(
+                    'components' => array_values(array_filter(array_merge(
                         [
-                            [
-                                'type' => 'header',
-                                'parameters' => [
-                                    static::addUrls($template)
-                                ]
-                            ],
-                            [
-                                'type' => 'body',
-                                'parameters' => static::addVariables($template)
-                            ],
+                            static::createHeader($template),
+                            static::createBody($template),
                         ],
-                        static::addReplies($template),
-                    )
+                        static::addReplies($template)
+                    )))
                 ]
             ]
+        ];
+    }
+
+    /**
+     * @param Template $template
+     * @return array
+     */
+    private static function createHeader(Template $template): array
+    {
+        $urls = static::addUrls($template);
+
+        if (empty($urls)) return [];
+
+        return [
+            'type' => 'header',
+            'parameters' => [
+                $urls
+            ]
+        ];
+    }
+
+    /**
+     * @param Template $template
+     * @return array
+     */
+    private static function createBody(Template $template): array
+    {
+        $variables = static::addVariables($template);
+
+        if (empty($variables)) return [];
+
+        return [
+            'type' => 'body',
+            'parameters' => $variables
         ];
     }
 
