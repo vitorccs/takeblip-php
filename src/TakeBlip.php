@@ -6,7 +6,7 @@ use TakeBlip\Exceptions\TakeBlipException;
 use TakeBlip\Factories\MessageFactory;
 use TakeBlip\Helpers\SanitizerHelper;
 use TakeBlip\Http\Resource;
-use TakeBlip\Models\Template;
+use TakeBlip\Entities\Template;
 
 class TakeBlip extends Resource
 {

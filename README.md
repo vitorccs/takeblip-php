@@ -4,7 +4,7 @@ SDK PHP para a API de Notificações WhatsApp da Take Blip
 
 ## Requisitos
 
-* PHP >= 7.4
+* PHP >= 8.1
 
 ## Descrição
 
@@ -20,10 +20,10 @@ composer require vitorccs/takeblip-php
 
 ## Parâmetros
 
-Parâmetro | Obrigatório | Padrão | Comentário
------------- | ------------- | ------------- | -------------
-TAKEBLIP_API_KEY | Sim | null | Token de acesso da API
-TAKEBLIP_API_TIMEOUT | Não | 20 | Timeout em segundos para estabelecer conexão com a API
+| Parâmetro            | Obrigatório | Padrão | Comentário                                             |
+|----------------------|-------------|--------|--------------------------------------------------------|
+| TAKEBLIP_API_KEY     | Sim         | null   | Token de acesso da API                                 |
+| TAKEBLIP_API_TIMEOUT | Não         | 20     | Timeout em segundos para estabelecer conexão com a API |
 
 ## Como usar
 
@@ -52,7 +52,7 @@ $response = $takeBlip->getMessageTemplates();
 $response = $takeBlip->getUserIdentity('551190000000');
 
 // Enviar Notificação Ativa
-$takeBlip->sendNotification($template);
+$takeBlip->sendNotification($pictureTemplate);
 
 // Consultar os eventos da Notificação disparada
 $takeBlip->getNotificationEvents('myNotificationId');

@@ -2,14 +2,17 @@
 
 namespace TakeBlip\Test\Factories;
 
+use TakeBlip\Entities\Template;
 use TakeBlip\Factories\MessageFactory;
-use TakeBlip\Models\Template;
 use TakeBlip\Test\BaseTest;
 
 class MessageFactoryTest extends BaseTest
 {
     /**
-     * @dataProvider validTemplate
+     * @dataProvider validTextTemplate
+     * @dataProvider validDocumentTemplate
+     * @dataProvider validImageTemplate
+     * @dataProvider validVideoTemplate
      */
     public function testBase(Template $template)
     {
@@ -38,70 +41,149 @@ class MessageFactoryTest extends BaseTest
     }
 
     /**
-     * @dataProvider validTemplate
+     * @dataProvider validTextTemplate
+     * @dataProvider validDocumentTemplate
+     * @dataProvider validImageTemplate
+     * @dataProvider validVideoTemplate
      */
-    public function testVariables(Template $template)
+    public function testHeaderSection(Template $template)
     {
         $message = MessageFactory::create($template);
 
-        $variables = array_values(array_filter($message['content']['template']['components'], function ($component) {
-            return $component['type'] === 'body';
-        }));
+        $headers = array_values(
+            array_filter(
+                $message['content']['template']['components'],
+                fn($component) => ($component['type'] ?? null) === 'header'
+            )
+        );
 
-        $this->assertCount(1, $variables);
-        $this->assertArrayHasKey('parameters', $variables[0]);
-        $this->assertCount(count($template->variables), $variables[0]['parameters']);
+        $isHeaderRequired = !is_null($template->url);
 
-        foreach($variables[0]['parameters'] as $parameter) {
-            $this->assertArrayHasKey('type', $parameter);
-            $this->assertArrayHasKey('text', $parameter);
+        $this->assertCount($isHeaderRequired ? 1 : 0, $headers);
+
+        if ($isHeaderRequired) {
+            $this->assertUrls($template, reset($headers));
         }
     }
 
     /**
-     * @dataProvider validTemplate
+     * @dataProvider validTextTemplate
+     * @dataProvider validDocumentTemplate
+     * @dataProvider validImageTemplate
+     * @dataProvider validVideoTemplate
      */
-    public function testReplies(Template $template)
+    public function testBodySection(Template $template)
     {
         $message = MessageFactory::create($template);
 
-        $replies = array_values(array_filter($message['content']['template']['components'], function ($component) {
-            return $component['type'] === 'button' &&
-                $component['sub_type'] === 'quick_reply' &&
-                is_numeric($component['index'] ?? null);
-        }));
+        $bodies = array_values(
+            array_filter(
+                $message['content']['template']['components'],
+                fn($component) => $component['type'] === 'body'
+            )
+        );
 
-        $this->assertCount(count($template->replies), $replies);
-        $this->assertArrayHasKey('parameters', $replies[0]);
-        $this->assertCount(1, $replies[0]['parameters']);
-        $this->assertArrayHasKey('type', $replies[0]['parameters'][0]);
-        $this->assertArrayHasKey('payload', $replies[0]['parameters'][0]);
+        $isBodyRequired = count($template->variables);
+
+        $this->assertCount($isBodyRequired ? 1 : 0, $bodies);
+
+        if ($isBodyRequired) {
+            $this->assertVariables($template, reset($bodies));
+        }
     }
 
     /**
-     * @dataProvider validTemplate
+     * @dataProvider validTextTemplate
+     * @dataProvider validDocumentTemplate
+     * @dataProvider validImageTemplate
+     * @dataProvider validVideoTemplate
      */
-    public function testUrls(Template $template)
+    public function testRepliesSection(Template $template)
     {
         $message = MessageFactory::create($template);
 
-        $urls = array_values(array_filter($message['content']['template']['components'], function ($component) {
-            return $component['type'] === 'header';
-        }));
+        $replies = array_values(
+            array_filter($message['content']['template']['components'],
+                function ($component) {
+                    return ($component['type'] ?? null) === 'button' &&
+                        ($component['sub_type'] ?? null) === 'quick_reply';
+                }
+            )
+        );
 
-        $countTemplateUrl = is_null($template->url) ? 0 : 1;
+        $this->assertCount(count($template->replies), $replies);
 
-        $this->assertCount($countTemplateUrl, $urls);
+        foreach ($replies as $i => $reply) {
+            $this->assertArrayHasKey('index', $reply);
+            $this->assertArrayHasKey('parameters', $reply);
 
-        if ($countTemplateUrl > 0) {
-            $this->assertArrayHasKey('parameters', $urls[0]);
-            $this->assertCount(1, $urls[0]['parameters']);
-            $this->assertArrayHasKey('type', $urls[0]['parameters'][0]);
+            $this->assertSame($i, $reply['index']);
+            $this->assertCount(1, $reply['parameters']);
 
-            $type = $urls[0]['parameters'][0]['type'];
-            $this->assertArrayHasKey($type, $urls[0]['parameters'][0]);
-            $this->assertArrayHasKey('link', $urls[0]['parameters'][0][$type]);
-            $this->assertArrayHasKey('filename', $urls[0]['parameters'][0][$type]);
+            $this->assertArrayHasKey('type', $reply['parameters'][0]);
+            $this->assertArrayHasKey('payload', $reply['parameters'][0]);
+
+            $this->assertSame($template->replies[$i], $reply['parameters'][0]['payload']);
+        }
+    }
+
+    /**
+     * @param Template $template
+     * @param array $header
+     * @return void
+     */
+    private function assertUrls(Template $template, array $header): void
+    {
+        $this->assertArrayHasKey('parameters', $header);
+
+        $urls = array_values(
+            array_filter(
+                $header['parameters'],
+                fn($parameter) => in_array(($parameter['type'] ?? null), ['document', 'image', 'video'])
+            )
+        );
+
+        $this->assertCount(1, $urls);
+
+        foreach ($urls as $url) {
+            $type = $template->url->type->value;
+
+            $this->assertSame($type, $url['type']);
+            $this->assertArrayHasKey($type, $url);
+
+            $this->assertArrayHasKey('link', $url[$type]);
+            $this->assertSame($template->url->url, $url[$type]['link']);
+
+            if (!is_null($template->url->filename)) {
+                $this->assertArrayHasKey('filename', $url[$type]);
+                $this->assertSame($template->url->filename, $url[$type]['filename']);
+            } else {
+                $this->assertArrayNotHasKey('filename', $url[$type]);
+            }
+        }
+    }
+
+    /**
+     * @param Template $template
+     * @param array $body
+     * @return void
+     */
+    private function assertVariables(Template $template, array $body): void
+    {
+        $this->assertArrayHasKey('parameters', $body);
+
+        $variables = array_values(
+            array_filter(
+                $body['parameters'],
+                fn($parameter) => ($parameter['type'] ?? null) === 'text'
+            )
+        );
+
+        $this->assertCount(count($template->variables), $variables);
+
+        foreach ($variables as $i => $variable) {
+            $this->assertArrayHasKey('text', $variable);
+            $this->assertSame($template->variables[$i], $variable['text']);
         }
     }
 }

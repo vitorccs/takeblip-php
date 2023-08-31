@@ -1,6 +1,6 @@
 <?php
 
-namespace TakeBlip\Models;
+namespace TakeBlip\Entities;
 
 class Template
 {
