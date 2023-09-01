@@ -8,11 +8,13 @@ class TemplateUrlDocument extends TemplateUrl
 {
     /**
      * @param string $url
-     * @param string $filename
+     * @param string|null $filename
      */
     public function __construct(string $url,
-                                string $filename)
+                                ?string $filename = null)
     {
+        $filename = $filename ?: basename($url);
+
         parent::__construct($url, TemplateType::DOCUMENT, $filename);
     }
 }
