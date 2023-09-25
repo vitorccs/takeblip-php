@@ -60,11 +60,11 @@ class TakeBlip extends Resource
     }
 
     /**
-     * @param Template|array $template
+     * @param array|Template $template
      * @return null
      * @throws TakeBlipException
      */
-    public function sendNotification($template)
+    public function sendNotification(Template|array $template)
     {
         $message = $template instanceof Template
             ? MessageFactory::create($template)

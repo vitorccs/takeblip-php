@@ -17,10 +17,16 @@ class ClientFactory
      */
     const API_TIMEOUT_NAME = 'TAKEBLIP_API_TIMEOUT';
 
+
+    /**
+     * API URL Parameter
+     */
+    const API_URL_NAME = 'TAKEBLIP_API_URL';
+
     /**
      * The API base URL
      */
-    const BASE_URL = 'https://msging.net';
+    const DEFAULT_API_URL = 'https://msging.net';
 
     /**
      * Default API timeout
@@ -28,9 +34,9 @@ class ClientFactory
     const DEFAULT_TIMEOUT = 20;
 
     /**
-     *
+     * The SDK version number
      */
-    const SDK_VERSION = '1.1.0';
+    const SDK_VERSION = '1.2.0';
 
     /**
      * @var string|null
@@ -43,16 +49,24 @@ class ClientFactory
     private static int $timeout;
 
     /**
+     * @var string|null
+     */
+    private static ?string $apiUrl;
+
+    /**
      * @param string|null $apiKey
      * @param int|null $timeout
+     * @param string|null $apiUrl
      * @return Client
      * @throws TakeBlipException
      */
     public static function create(?string $apiKey = null,
-                                  ?int    $timeout = null): Client
+                                  ?int    $timeout = null,
+                                  ?string $apiUrl = null): Client
     {
         self::$apiKey = $apiKey ?: getenv(self::API_KEY_NAME) ?: null;
         self::$timeout = $timeout ?: getenv(self::API_TIMEOUT_NAME) ?: self::DEFAULT_TIMEOUT;
+        self::$apiUrl = $apiUrl ?: getenv(self::API_URL_NAME) ?: self::DEFAULT_API_URL;
 
         self::validate();
 
@@ -79,7 +93,7 @@ class ClientFactory
     private static function getClient(): Client
     {
         return new Client([
-            'base_uri' => self::BASE_URL,
+            'base_uri' => self::$apiUrl,
             'timeout' => self::$timeout,
             'headers' => [
                 'Content-Type' => 'application/json',

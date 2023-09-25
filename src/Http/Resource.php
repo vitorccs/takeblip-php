@@ -21,13 +21,16 @@ class Resource
     private Client $client;
 
     /**
-     *
+     * @param string|null $apiKey
+     * @param int|null $timeout
+     * @param string|null $apiUrl
      * @throws TakeBlipException
      */
     public function __construct(?string $apiKey = null,
-                                ?int    $timeout = null)
+                                ?int    $timeout = null,
+                                ?string $apiUrl = null)
     {
-        $this->client = ClientFactory::create($apiKey, $timeout);
+        $this->client = ClientFactory::create($apiKey, $timeout, $apiUrl);
     }
 
     /**
